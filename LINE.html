@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./sample.css">
+  <title>menhera_mioyamazaki_chatroom</title>
+  <style>
+    #output li {
+      background: #ccc;
+    }
+  </style>
+
+</head>
+
+<body>
+  <h1>メンヘラな時に気持ちを吐き出すチャットルーム</h1>
+  <form>
+    <fieldset>
+      <legend>ミオラー入力画面</legend>
+      <div>
+        menhera: <input type="text" id="name">
+      </div>
+      <div>
+        doushitano?: <input type="text" id="text">
+      </div>
+      <div>
+        <button type="button" id="sendBtn">send</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <div class="line">
+    <div class="line_title">
+      密会〜2人でケータイ捨てようよ〜
+    </div>
+
+    <div class="line_scroll">
+      <div id="room">
+        <div class="box-left">
+          <figure>
+            <img src="icon.jpg" />
+          </figure>
+          <div class="left">
+            <div class="message-box white"></div>
+            <div class="name">ミオヤマザキ</div>
+            <div class="text">
+              メンヘラが喜ぶ三大名言「どうしたの？」「大丈夫？」「今行くから」<br>
+              <br>
+              めん-へら[menhera]【メンヘラ】：寂しいだけ。かまって欲しいだけ。愛されたいだけ。<br>
+              せっくす[sekkusu]【SEX】：-男-体を満たす行為(相手に依存性ナシ) -女-心を満たす手段(相手に依存性アリ)<br>
+              うわ-き[uwaki]【浮気】：男の浮気は下心。女の浮気はただ本気。<br>
+              ふ-りん[hurin]【不倫】：バレなければみんな幸せ。<br>
+              おとこ[otoko]【男】：女々しい(ワルモノ)。 <br>
+              おんな[onnna]【女】：メンヘラ(ワレモノ)。 <br>
+              こい[koi]【恋】：無償。私があなた好みに変わろうとする様。<br>
+              あい[ai]【愛】：有償。自分を犠牲にしてでも守りたいと思う心。 <br>
+              お-かね[okane] 【お金】：買えるもの：「愛」「体」「夢」etc...お金で買えないものは無い。<br>
+              やん-でれ[yandere] 【ヤンデレ】：世界に私とあなただけでいい。<br>
+              じょう[jou] 【情】：邪魔。<br>
+              きたい[ki-tai] 【期待】：大きくなればなるほど失うと反動大。元々無ければ傷つかない。<br>
+              こうかい[kou-kai] 【後悔】：後悔した数だけ強くなれる。な訳ない。<br>
+              えいえん[ei-en] 【永遠】：だから無いよそんなもん。でも欲しいんだ。<br>
+              みおらー[mio-raa]【ミオラー】：ミオヤマザキを必要としてくれる人<br>
+              みお-やまざき[mioyamazaki]【ミオヤマザキ】：コレ全部。 <br>
+              <br>
+              き-ど-あい-らく[kidoairaku] 【喜怒哀楽】<br>
+              喜・・・あなたといるとき<br>
+              怒・・・あなたといるとき<br>
+              哀・・・あなたといるとき<br>
+              楽・・・あなたといるとき<br>
+            </div>
+            <figure>
+              <img src="icon.jpg" />
+            </figure>
+            <div class="left">
+              <div class="stamp"><img src="menhera.png" /></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-right">
+          <div class="message-box green"></div>
+          <span class="date">既読<br></span>
+          <div class="text">
+            <ul id="output1"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a class="twitter-timeline" href="https://twitter.com/mio_yamazaki?ref_src=twsrc%5Etfw">Tweets by mio_yamazaki</a>
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+  // 日時をいい感じの形式にする関数
+  function convertTimestampToDatetime(timestamp) {
+    const _d = timestamp ? new Date(timestamp * 1000) : new Date();
+    const Y = _d.getFullYear();
+    const m = (_d.getMonth() + 1).toString().padStart(2, '0');
+    const d = _d.getDate().toString().padStart(2, '0');
+    const H = _d.getHours().toString().padStart(2, '0');
+    const i = _d.getMinutes().toString().padStart(2, '0');
+    const s = _d.getSeconds().toString().padStart(2, '0');
+    return `${Y}/${m}/${d} ${H}:${i}:${s}`;
+  }
+</script>
+
+<!-- 以下にfirebaseのコードを貼り付けよう -->
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp,
+    query,
+    orderBy,
+    onSnapshot,
+  } from "https://www.gstatic.com/firebasejs/9.5.0/firebase-firestore.js";
+
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyA2WNeEXRS2_KP-lLJaKzR6TL3AqO0R2pE",
+    authDomain: "bot-b1f77.firebaseapp.com",
+    projectId: "bot-b1f77",
+    storageBucket: "bot-b1f77.appspot.com",
+    messagingSenderId: "699499386466",
+    appId: "1:699499386466:web:e5a8fe5f390c412218233b"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  $("#sendBtn").on("click", function () {
+    const data = {
+      name: $("#name").val(),
+      text: $("#text").val(),
+      time: serverTimestamp(),
+    };
+    addDoc(collection(db, "menhera"), data);
+    $("#text").val("");
+  });
+  const q = query(collection(db, "menhera"), orderBy("time", "desc"));
+  onSnapshot(q, (querySnapshot) => {
+    // 省略
+  });
+
+  // データ取得処理
+  onSnapshot(collection(db, "menhera"), (querySnapshot) => {
+    console.log(querySnapshot.docs[0].id);
+    console.log(querySnapshot.docs[0].data());
+
+    const dataArray = [];
+    querySnapshot.docs.forEach(function (doc) {
+      const data = {
+        id: doc.id,
+        data: doc.data(),
+      };
+      dataArray.push(data);
+    });
+
+    console.log(dataArray);
+    const tagArray = [];
+    dataArray.forEach(function (data) {
+      tagArray.push(`
+    <li id="${data.id}">
+      <p>${data.data.name} at ${convertTimestampToDatetime(data.data.time.seconds)}</p>
+      <p>${data.data.text}</p>
+    </li>
+  `);
+    });
+
+    $("#output1").html(tagArray);
+    $("#output2").html(tagArray);
+  });
+
+  $("#text").on("keydown", function (e) {
+    console.log(e.keyCode)
+  });
+
+  $("#text").on("keydown", function (e) {
+    if (e.keyCode === 13) {
+      const data = {
+        name: $("#name").val(),
+        text: $("#text").val(),
+        time: serverTimestamp(),
+      };
+      addDoc(collection(db, "menhera"), data);
+      $("#text").val("");
+    }
+  });
+</script>
+
+</html>
